@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  web:
+    build:
+      context: ./clients
+      target: web_prod_full
+  web_embedded:
+    build:
+      context: ./clients
+      target: web_prod_embedded

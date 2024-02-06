@@ -1,0 +1,122 @@
+version: "3.9"
+services:
+  caddy:
+    build:
+      context: ./development/containers/caddy
+    ports:
+      - 8000:80
+      - 8001:81
+  backend:
+    &backend
+    build:
+      context: ./backend/core
+    volumes:
+      - ./backend/core/config:/app/config
+      - ./backend/core/guides:/app/guides
+      - ./backend/core/.devcontainer:/app/.devcontainer
+      - ./backend/core/debug:/app/debug
+      - ./clients/v1-schema.yaml:/app/v1-schema.yaml:delegated
+    command: ["wait-for-it", "db:3306", "--", "./manage.py", "runserver", "0.0.0.0:8080"]
+    ports:
+      - 8080:8080
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: core
+      MYSQL_USER: upwardlicore
+      MYSQL_PASSWORD: password
+      DEBUG: 1
+    depends_on:
+      - db
+  backend_migration:
+    <<: *backend
+    # Runs migrations and sets up the DB in dev
+    command: bash -c 'wait-for-it db:3306 -- ./manage.py migrate && ./manage.py dev_seed_users'
+    ports: []
+  edgeworker:
+    build:
+      context: ./edgeworker
+  web: &web_base
+    build:
+      context: ./clients
+      target: base
+    command: yarn workspace @upwardli/web run dev
+    volumes:
+      - ./clients/package.json:/app/package.json:delegated
+      - ./clients/package-lock.json:/app/package-lock.json:delegated
+
+      - ./clients/web/.env.development:/app/web/.env.development:delegated
+      - ./clients/web/package.json:/app/web/package.json:delegated
+      - ./clients/web/package-lock.json:/app/web/package-lock.json:delegated
+
+      - ./clients/v1-schema.yaml:/app/v1-schema.yaml:delegated
+      - ./clients/shared/api.ts:/app/shared/api.ts:delegated
+
+      - ./clients/web/README.md:/app/web/README.md:delegated
+      - ./clients/web/public:/app/web/public:delegated
+      - ./clients/web/pages:/app/web/pages:delegated
+      - ./clients/web/components:/app/web/components:delegated
+      - ./clients/web/styles:/app/web/styles:delegated
+      - ./clients/web/next-env.d.ts:/app/web/next-env.d.ts:delegated
+      - ./clients/web/tsconfig.json:/app/web/tsconfig.json:delegated
+      - ./clients/web/next.config.js:/app/web/next.config.js:delegated
+    ports:
+      - 3000:3000
+    environment:
+      - UPWARDLI_RUNTIME_CONTEXT=web
+      - UPWARDLI_WEB_CONTEXT=full
+      - UPWARDLI_API_HOST=http://backend:8080
+  web_embedded:
+    <<: *web_base
+    ports:
+      - 3001:3000
+    environment:
+      - UPWARDLI_RUNTIME_CONTEXT=web
+      - UPWARDLI_WEB_CONTEXT=embedded
+      - UPWARDLI_API_HOST=http://backend:8080
+  native:
+    build:
+      context: ./clients
+      target: base
+    ports:
+      - 19000:19000
+      - 19001:19001
+      - 19002:19002
+    command: yarn workspace @upwardli/native run dev
+    volumes:
+      - ./clients/package.json:/app/package.json:delegated
+      - ./clients/package-lock.json:/app/package-lock.json:delegated
+
+      - ./clients/native/package.json:/app/native/package.json:delegated
+      - ./clients/native/package-lock.json:/app/native/package-lock.json:delegated
+
+      - ./clients/v1-schema.yaml:/app/v1-schema.yaml:delegated
+      - ./clients/shared/api.ts:/app/shared/api.ts:delegated
+
+      - ./clients/native/App.tsx:/app/native/App.tsx:delegated
+      - ./clients/native/app.json:/app/native/app.json:delegated
+      - ./clients/native/babel.config.js:/app/native/babel.config.js:delegated
+      - ./clients/native/hooks:/app/native/hooks:delegated
+      - ./clients/native/components:/app/native/components:delegated
+      - ./clients/native/navigation:/app/native/navigation:delegated
+      - ./clients/native/assets:/app/native/assets:delegated
+      - ./clients/native/constants:/app/native/constants:delegated
+      - ./clients/native/screens:/app/native/screens:delegated
+      - ./clients/native/types.tsx:/app/native/types.tsx:delegated
+      - ./clients/native/tsconfig.json:/app/native/tsconfig.json:delegated
+
+    environment:
+      # Needed to let Expo find your container
+      - REACT_NATIVE_PACKAGER_HOSTNAME
+      - UPWARDLI_RUNTIME_CONTEXT=native
+      - UPWARDLI_API_HOST=http://${REACT_NATIVE_PACKAGER_HOSTNAME}:8001
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
+      MYSQL_DATABASE: core
+      MYSQL_USER: upwardlicore
+      MYSQL_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10

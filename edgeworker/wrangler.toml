@@ -1,0 +1,10 @@
+type = "webpack"
+account_id = "b9edee195d07544a873030cc7acf2a46"
+route = ""
+workers_dev = true
+webpack_config = "webpack.config.js"
+name = "edgeworker"
+
+[env.production]
+zone_id = "48f041cd6beecf6e4905bc793671813e"
+route = "www.upwardli.com/*"

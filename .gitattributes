@@ -1,0 +1,2 @@
+# Force lf endings on windows for Docker containers
+* text=auto eol=lf

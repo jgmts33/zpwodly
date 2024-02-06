@@ -1,0 +1,22 @@
+{
+    "name": "Backend Core",
+    "dockerComposeFile": [
+        "../../../docker-compose.yml"
+    ],
+    "service": "backend",
+    "shutdownAction": "none",
+    "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+    ],
+    "postCreateCommand": "pip install black bandit pylint mypy",
+    "settings": {
+        "python.formatting.provider": "black",
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true
+    },
+    // Open the sub-folder with the source code
+    "workspaceFolder": "/app",
+    // Run as vscode user (which should match host user ID)
+    "remoteUser": "vscode",
+}

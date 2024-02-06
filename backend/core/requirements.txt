@@ -1,0 +1,20 @@
+Django==3.2
+factory-boy
+mysqlclient
+# TODO: Bump to any release post-3.12.4
+# djangorestframework
+https://github.com/encode/django-rest-framework/archive/refs/heads/master.zip
+# markdown for browsable API
+markdown
+# django-filter for automatic restframework filtering
+django-filter
+# django authentication and registration support 
+# TODO: Once https://github.com/iMerica/dj-rest-auth/pull/283 is merged
+# go back to pypi distribution
+# dj-rest-auth[with_social]
+dj-rest-auth[with_social] @ https://github.com/philipkimmey/dj-rest-auth/archive/refs/heads/login-schema-fixes.zip
+# JWT-based authentication token support
+djangorestframework-simplejwt
+# Used to generate schema into YAML-based OpenAPI format
+pyyaml 
+uritemplate

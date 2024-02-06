@@ -1,0 +1,26 @@
+{
+    "name": "Clients (Web)",
+    "dockerComposeFile": [
+        "../../../docker-compose.yml"
+    ],
+    "service": "web",
+    "shutdownAction": "none",
+    "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint"
+    ],
+    "postCreateCommand": "",
+    "settings": {
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "files.exclude": {
+            // Ignore .next generated files
+            "**/.next": true
+        }
+    },
+    // Open the sub-folder with the source code
+    "workspaceFolder": "/app",
+    // Run as vscode user (which should match host user ID)
+    "remoteUser": "node"
+}

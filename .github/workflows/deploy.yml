@@ -1,0 +1,32 @@
+name: Deploy Stable Branch
+on:
+  workflow_run:
+    workflows: ["CI/CD Workflow"]
+    types: [completed]
+jobs:
+  backend-container-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.IAM_CORE_DEPLOY_ID_DEV }}
+          aws-secret-access-key: ${{ secrets.IAM_CORE_DEPLOY_SECRET_DEV }}
+          aws-region: us-east-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+
+      - name: Deploy to Lambda
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: core-dev
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          aws lambda update-function-code \
+            --function-name arn:aws:lambda:us-east-2:490799294904:function:core-dev \
+            --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

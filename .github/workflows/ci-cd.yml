@@ -1,0 +1,115 @@
+name: CI/CD Workflow
+on: [push]
+jobs:
+  edgeworker-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - run: npm install
+        working-directory: ./edgeworker
+      - run: npm test
+        working-directory: ./edgeworker
+  clients-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - run: npx prettier -c .
+        working-directory: ./clients
+  edgeworker-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - run: npx prettier -c .
+        working-directory: ./edgeworker
+  backend-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Python3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - run: pip install black
+        working-directory: ./backend/core
+      - run: black --check .
+        working-directory: ./backend/core
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Python3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - run: pip install -r requirements.txt
+        working-directory: ./backend/core
+
+      - run: ./manage.py test
+        working-directory: ./backend/core
+        env:
+          SQLITE: true
+          DEBUG: true
+
+  clients-container-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build web container
+        run: |
+          docker-compose build -f docker-compose.yml -f docker-compose.build.yml web
+
+      - name: Build web_embedded container
+        run: |
+          docker-compose build -f docker-compose.yml -f docker-compose.build.yml web_embedded
+
+  backend-container-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.IAM_CORE_DEPLOY_ID_DEV }}
+          aws-secret-access-key: ${{ secrets.IAM_CORE_DEPLOY_SECRET_DEV }}
+          aws-region: us-east-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: core-dev
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG backend/core
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  openapi-schema-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Build backend container
+        run: docker-compose build backend
+
+      - name: Compare schemas
+        run: docker-compose run --rm --no-deps backend ./manage.py generateschema | diff -Z clients/v1-schema.yaml -

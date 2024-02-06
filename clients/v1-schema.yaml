@@ -1,0 +1,581 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /core/api/v1/logout/:
+    get:
+      operationId: listLogouts
+      description: 'Calls Django logout method and delete the Token object
+
+        assigned to the current User object.
+
+
+        Accepts/Returns nothing.'
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+          description: ''
+      tags:
+      - core
+    post:
+      operationId: createLogout
+      description: 'Calls Django logout method and delete the Token object
+
+        assigned to the current User object.
+
+
+        Accepts/Returns nothing.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+          application/x-www-form-urlencoded:
+            schema: {}
+          multipart/form-data:
+            schema: {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - core
+  /core/api/v1/user/:
+    get:
+      operationId: retrieveUserDetails
+      description: 'Reads and updates UserModel fields
+
+        Accepts GET, PUT, PATCH methods.
+
+
+        Default accepted fields: username, first_name, last_name
+
+        Default display fields: pk, username, email, first_name, last_name
+
+        Read-only fields: pk, email
+
+
+        Returns UserModel fields.'
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+      tags:
+      - core
+    put:
+      operationId: updateUserDetails
+      description: 'Reads and updates UserModel fields
+
+        Accepts GET, PUT, PATCH methods.
+
+
+        Default accepted fields: username, first_name, last_name
+
+        Default display fields: pk, username, email, first_name, last_name
+
+        Read-only fields: pk, email
+
+
+        Returns UserModel fields.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+      tags:
+      - core
+    patch:
+      operationId: partialUpdateUserDetails
+      description: 'Reads and updates UserModel fields
+
+        Accepts GET, PUT, PATCH methods.
+
+
+        Default accepted fields: username, first_name, last_name
+
+        Default display fields: pk, username, email, first_name, last_name
+
+        Read-only fields: pk, email
+
+
+        Returns UserModel fields.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+      tags:
+      - core
+  /core/api/v1/password/reset/:
+    post:
+      operationId: createPasswordReset
+      description: 'Calls Django Auth PasswordResetForm save method.
+
+
+        Accepts the following POST parameters: email
+
+        Returns the success/fail message.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordReset'
+          description: ''
+      tags:
+      - core
+  /core/api/v1/password/reset/confirm/:
+    post:
+      operationId: createPasswordResetConfirm
+      description: "Password reset e-mail link is confirmed, therefore\nthis resets\
+        \ the user's password.\n\nAccepts the following POST parameters: token, uid,\n\
+        \    new_password1, new_password2\nReturns the success/fail message."
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetConfirm'
+          description: ''
+      tags:
+      - core
+  /core/api/v1/login/:
+    post:
+      operationId: createLogin
+      description: 'Check the credentials and return the REST Token
+
+        if the credentials are valid and authenticated.
+
+        Calls Django Auth login method to register User ID
+
+        in Django session framework
+
+
+        Accept the following POST parameters: username, password
+
+        Return the REST Framework Token Object''s key.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWT'
+          description: ''
+      tags:
+      - core
+  /core/api/v1/password/change/:
+    post:
+      operationId: createPasswordChange
+      description: 'Calls Django Auth SetPasswordForm save method.
+
+
+        Accepts the following POST parameters: new_password1, new_password2
+
+        Returns the success/fail message.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordChange'
+          description: ''
+      tags:
+      - core
+  /core/api/v1/token/verify/:
+    post:
+      operationId: createTokenVerify
+      description: 'Takes a token and indicates if it is valid.  This view provides
+        no
+
+        information about a token''s fitness for a particular use.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
+      tags:
+      - core
+  /core/api/v1/token/refresh/:
+    post:
+      operationId: createTokenRefresh
+      description: 'Takes a refresh type JSON web token and returns an access type
+        JSON web
+
+        token if the refresh token is valid.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+      tags:
+      - core
+  /core/api/v1/registration/:
+    post:
+      operationId: createRegister
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWT'
+          description: ''
+      tags:
+      - core
+  /core/api/v1/registration/verify-email/:
+    post:
+      operationId: createVerifyEmail
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyEmail'
+          description: ''
+      tags:
+      - core
+  /core/api/v1/token/:
+    post:
+      operationId: createTokenObtainPair
+      description: 'Takes a set of user credentials and returns an access and refresh
+        JSON web
+
+        token pair to prove the authentication of those credentials.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+      tags:
+      - core
+components:
+  schemas:
+    UserDetails:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+      required:
+      - username
+    PasswordReset:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    PasswordResetConfirm:
+      type: object
+      properties:
+        new_password1:
+          type: string
+          maxLength: 128
+        new_password2:
+          type: string
+          maxLength: 128
+        uid:
+          type: string
+        token:
+          type: string
+      required:
+      - new_password1
+      - new_password2
+      - uid
+      - token
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - password
+    JWT:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        user:
+          type: object
+          properties:
+            pk:
+              type: integer
+              readOnly: true
+            username:
+              type: string
+              description: Required. 150 characters or fewer. Letters, digits and
+                @/./+/-/_ only.
+              pattern: ^[\w.@+-]+\z
+              maxLength: 150
+            email:
+              type: string
+              format: email
+              readOnly: true
+            first_name:
+              type: string
+              maxLength: 150
+            last_name:
+              type: string
+              maxLength: 150
+          required:
+          - username
+      required:
+      - access_token
+      - refresh_token
+      - user
+    PasswordChange:
+      type: object
+      properties:
+        new_password1:
+          type: string
+          maxLength: 128
+        new_password2:
+          type: string
+          maxLength: 128
+      required:
+      - new_password1
+      - new_password2
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+      - token
+    CookieTokenRefresh:
+      type: object
+      properties:
+        refresh:
+          type: string
+          description: WIll override cookie.
+        access:
+          type: string
+          readOnly: true
+    Register:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 150
+          minLength: 1
+        email:
+          type: string
+          format: email
+        password1:
+          type: string
+          writeOnly: true
+        password2:
+          type: string
+          writeOnly: true
+      required:
+      - username
+      - email
+      - password1
+      - password2
+    VerifyEmail:
+      type: object
+      properties:
+        key:
+          type: string
+      required:
+      - key
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - username
+      - password
+    TokenRefresh:
+      type: object
+      properties:
+        refresh:
+          type: string
+        access:
+          type: string
+          readOnly: true
+      required:
+      - refresh
